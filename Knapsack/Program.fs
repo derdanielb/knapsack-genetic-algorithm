@@ -13,7 +13,10 @@ module Data =
     let knapsackSize = 5
     let individualAmount = 10
     let generations = 10
+    let calculateFitness = 
+        0 //TODO implement
 
+        
 
 
 module Initialization =
@@ -25,6 +28,8 @@ module Initialization =
         res.[0]
 
     let generateRandomIndividual size =
+        // needs sleep because of the weird bug that creates the same individual over and over again. Sleep somehow sloves it
+        Thread.Sleep(100) 
         let individual = Array.create size -1
         let rnd = System.Random()
         for i = 0 to individual.Length-1 do
@@ -35,6 +40,8 @@ module Initialization =
         individual
 
 
+module GeneticSelection = 
+    let individuals = [| for i in 0 .. Data.individualAmount -> Initialization.generateRandomIndividual Data.knapsackSize |]
     
     
 
@@ -44,8 +51,8 @@ module Initialization =
 
 [<EntryPoint>]
 let main argv = 
-    for i = 0 to 10 do 
-        Thread.Sleep(50)
-        printfn "%A" (Initialization.generateRandomIndividual Data.knapsackSize)
+    //for i = 0 to 10 do 
+    //    Thread.Sleep(50)
+    printfn "%A" GeneticSelection.individuals
     System.Console.ReadKey() |> ignore
     0 // return an integer exit code
