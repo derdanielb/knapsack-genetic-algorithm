@@ -1,20 +1,18 @@
 ﻿open System.Threading
 
-// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
-
-
-
-
-
 module Data =
     let itemsValue = [|0 .. 9|]
     let itemsWeight = [|0.0 .. 0.5 .. 5.0|]
     let knapsackSize = 5
+    let knapsackMaxWeight = 10
     let individualAmount = 10
     let generations = 10
-    let calculateFitness = 
-        0 //TODO implement
+    let tournamentSize = 10
+    let calculateFitness (individual : int[]) = 
+        let values = [| for i in 0 .. knapsackSize-1 -> itemsWeight.[individual.[i]]|]
+        Array.sum values
+
+open Data
 
         
 
@@ -28,7 +26,7 @@ module Initialization =
         res.[0]
 
     let generateRandomIndividual size =
-        // needs sleep because of the weird bug that creates the same individual over and over again. Sleep somehow sloves it
+        // needs sleep since rapid execution somehow creates the same individual over and over again. Sleep seems solve it
         Thread.Sleep(100) 
         let individual = Array.create size -1
         let rnd = System.Random()
@@ -39,11 +37,32 @@ module Initialization =
                     individual.[i] <- rand
         individual
 
+open Initialization
+
+module Utility =
+    /// Generates a tSize x 2 randomized tournament in range of 0 .. individualAmount
+    let generateTournament tournamentSize individualAmount =
+        let rnd = System.Random()
+        let tournament = [| for i in 0 .. tournamentSize -> 
+                            [|for j in 0 .. 1 -> (rnd.Next individualAmount) |] |]
+        tournament
+    /// Returns the index of the winner of both individuals
+    let determineWinner (duelPair : int[]) (individual1 : int[]) (individual2 : int[]) = 
+        if ((calculateFitness individual1) >= (calculateFitness individual2) ) then
+            duelPair.[0]
+        else duelPair.[1]
+
+open Utility
+        
+
 
 module GeneticSelection = 
-    let individuals = [| for i in 0 .. Data.individualAmount -> Initialization.generateRandomIndividual Data.knapsackSize |]
-    
-    
+    let individuals = [| for i in 0 .. individualAmount -> generateRandomIndividual knapsackSize |]
+    let tournamentA = generateTournament tournamentSize individualAmount
+    let tournamentB = generateTournament tournamentSize individualAmount
+    let winnersA = tournamentA |> Array.map (fun pair -> (determineWinner pair individuals.[pair.[0]] individuals.[pair.[1]]))  
+    let winnersB = tournamentB |> Array.map (fun pair -> (determineWinner pair individuals.[pair.[0]] individuals.[pair.[1]]))
+
 
             
         
@@ -51,8 +70,7 @@ module GeneticSelection =
 
 [<EntryPoint>]
 let main argv = 
-    //for i = 0 to 10 do 
-    //    Thread.Sleep(50)
     printfn "%A" GeneticSelection.individuals
+    printfn "%A" (Utility.generateTournament tournamentSize individualAmount)
     System.Console.ReadKey() |> ignore
     0 // return an integer exit code
