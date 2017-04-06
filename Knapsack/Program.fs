@@ -9,7 +9,7 @@ module Data =
     let generations = 10
     let tournamentSize = 10
     let calculateFitness (individual : int[]) = 
-        let values = [| for i in 0 .. knapsackSize-1 -> itemsWeight.[individual.[i]]|]
+        let values = [| for i in 0 .. knapsackSize-1 -> itemsValue.[individual.[i]]|]
         Array.sum values
 
 open Data
@@ -28,6 +28,8 @@ module Initialization =
     let generateRandomIndividual size =
         // needs sleep since rapid execution somehow creates the same individual over and over again. Sleep seems solve it
         Thread.Sleep(100) 
+        //TODO allow individuals be less than the maximal knapsacksize
+        //TODO check maxWeight as creation criteria 
         let individual = Array.create size -1
         let rnd = System.Random()
         for i = 0 to individual.Length-1 do
