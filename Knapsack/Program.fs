@@ -1,6 +1,4 @@
-﻿open System.Threading
-
-module Settings =
+﻿module Settings =
     let rnd = System.Random()
 
     // SAMPLE DATASET (Kreher and Stinson)
