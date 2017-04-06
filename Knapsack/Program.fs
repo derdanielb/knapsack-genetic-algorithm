@@ -1,6 +1,6 @@
 ﻿open System.Threading
 
-module Data =
+module Settings =
     let itemsValue = [|0 .. 9|]
     let itemsWeight = [|0.0 .. 0.5 .. 5.0|]
     let knapsackSize = 5
@@ -12,7 +12,7 @@ module Data =
         let values = [| for i in 0 .. knapsackSize-1 -> itemsValue.[individual.[i]]|]
         Array.sum values
 
-open Data
+open Settings
 
         
 
@@ -34,7 +34,7 @@ module Initialization =
         let rnd = System.Random()
         for i = 0 to individual.Length-1 do
             while individual.[i] < 0 do
-                let rand = rnd.Next Data.itemsValue.Length
+                let rand = rnd.Next itemsValue.Length
                 if(not(checkContains individual rand)) then
                     individual.[i] <- rand
         individual
@@ -42,8 +42,8 @@ module Initialization =
 open Initialization
 
 module Utility =
-    /// Generates a tSize x 2 randomized tournament in range of 0 .. individualAmount
-    let generateTournament tournamentSize individualAmount =
+    /// Generates a randomized tournament array of size "individualAmount" with index value pair (duel pairs) in range of 0 to "individualAmount"
+    let generateTournament =
         let rnd = System.Random()
         let tournament = [| for i in 0 .. tournamentSize -> 
                             [|for j in 0 .. 1 -> (rnd.Next individualAmount) |] |]
@@ -60,8 +60,8 @@ open Utility
 
 module GeneticSelection = 
     let individuals = [| for i in 0 .. individualAmount -> generateRandomIndividual knapsackSize |]
-    let tournamentA = generateTournament tournamentSize individualAmount
-    let tournamentB = generateTournament tournamentSize individualAmount
+    let tournamentA = generateTournament 
+    let tournamentB = generateTournament 
     let winnersA = tournamentA |> Array.map (fun pair -> (determineWinner pair individuals.[pair.[0]] individuals.[pair.[1]]))  
     let winnersB = tournamentB |> Array.map (fun pair -> (determineWinner pair individuals.[pair.[0]] individuals.[pair.[1]]))
 
@@ -73,6 +73,6 @@ module GeneticSelection =
 [<EntryPoint>]
 let main argv = 
     printfn "%A" GeneticSelection.individuals
-    printfn "%A" (Utility.generateTournament tournamentSize individualAmount)
+    printfn "%A" Utility.generateTournament
     System.Console.ReadKey() |> ignore
     0 // return an integer exit code
